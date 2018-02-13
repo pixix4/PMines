@@ -130,8 +130,13 @@ class Game:
                 s = set()
                 for d in Direction:
                     h = self.translate_point(p, d)
-                    if h not in self._mines:
-                        s.update(self._open(h))
+                    if h not in self._flags:
+                        if h in self._mines:
+                            self._running = False
+                            self._won = False
+                            return None
+                        else:
+                            s.update(self._open(h))
                 return s
 
         if p in self._mines:

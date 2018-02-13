@@ -1,5 +1,5 @@
 from enum import Enum
-from random import choices
+from random import sample
 from typing import Set, Tuple, Optional
 
 Point = Tuple[int, int]
@@ -89,7 +89,7 @@ class Game:
         allowed: Set[int] = set(range(0, self._width * self._height)) - lock
 
         self._mines = set()
-        for i in choices(population=list(allowed), k=self._count):
+        for i in sample(list(allowed), self._count):
             self._mines.add(self.int_to_point(i))
 
     def _open(self, p: Point) -> Set[Point]:
@@ -108,6 +108,15 @@ class Game:
                     changed.update(self._open(h))
 
         return changed
+
+    def check_finished(self):
+        if (len(self._mines - self._flags) <= 1) and len(self._opened) + len(self._mines) == self._width * self._height:
+            self._running = False
+            self._won = True
+
+    def lose(self):
+        self._running = False
+        self._won = False
 
     def click_field(self, p: Point) -> Optional[Set[Point]]:
         if self._mines is None:
@@ -130,27 +139,30 @@ class Game:
                 s = set()
                 for d in Direction:
                     h = self.translate_point(p, d)
-                    if h not in self._flags:
+                    if h is not None and h not in self._flags:
                         if h in self._mines:
-                            self._running = False
-                            self._won = False
+                            self.lose()
                             return None
                         else:
                             s.update(self._open(h))
+                self.check_finished()
                 return s
 
         if p in self._mines:
-            self._running = False
-            self._won = False
+            self.lose()
             return None
 
-        return self._open(p)
+        h = self._open(p)
+        self.check_finished()
+        return h
 
     def flag_field(self, p: Point) -> None:
-        if p in self._flags:
-            self._flags.remove(p)
-        else:
-            self._flags.add(p)
+        if p not in self._opened:
+            if p in self._flags:
+                self._flags.remove(p)
+            else:
+                self._flags.add(p)
+                self.check_finished()
 
     @property
     def mines_left(self) -> int:

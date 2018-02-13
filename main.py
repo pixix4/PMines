@@ -44,7 +44,7 @@ def main(stdscr):
         elif state == FieldState.FLAG_FALSE:
             stdscr.addstr(y, x, '!', curses.color_pair(9))
         elif state == FieldState.FLAG_RIGHT:
-            stdscr.addstr(y, x, '?', curses.color_pair(9))
+            stdscr.addstr(y, x, '?')
 
     def render_all():
         for x in range (0, game.width):
@@ -74,19 +74,19 @@ def main(stdscr):
         elif c == ord('f'):
             game.flag_field(p)
             refresh.add(p)
-        elif c == curses.KEY_UP:
+        elif c == curses.KEY_UP or c == ord('w') or c == ord('k'):
             y -= 1
             if y < 0:
                 y = 0
-        elif c == curses.KEY_LEFT:
+        elif c == curses.KEY_LEFT or c == ord('a') or c == ord('h'):
             x -= 2
             if x < 1:
                 x = 1
-        elif c == curses.KEY_RIGHT:
+        elif c == curses.KEY_RIGHT or c == ord('d') or c == ord('l'):
             x += 2
             if x >= game.width * 2:
                 x = game.width * 2 - 1
-        elif c == curses.KEY_DOWN:
+        elif c == curses.KEY_DOWN or c == ord('s') or c == ord('j'):
             y += 1
             if y >= game.height:
                 y = game.height - 1
@@ -99,7 +99,7 @@ def main(stdscr):
         stdscr.move(y, x)
 
     if game.won:
-        stdscr.addstr(game.height + 1, 1, "won", curses.color_pair(2))
+        stdscr.addstr(game.height + 1, 1, "won ", curses.color_pair(2))
     else:
         stdscr.addstr(game.height + 1, 1, "lost", curses.color_pair(9))
 

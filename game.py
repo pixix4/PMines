@@ -110,7 +110,7 @@ class Game:
         return changed
 
     def check_finished(self):
-        if (len(self._mines - self._flags) <= 1) and len(self._opened) + len(self._mines) == self._width * self._height:
+        if (len(self._mines - self._flags) == 0) and len(self._opened) + len(self._mines) == self._width * self._height:
             self._running = False
             self._won = True
 

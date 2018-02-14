@@ -17,12 +17,7 @@ def init_color():
     curses.init_pair(8, curses.COLOR_YELLOW, -1)
     curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_RED)
 
-
-def main(stdscr):
-    curses.use_default_colors()
-    stdscr.clear()
-    init_color()
-
+def game_round(stdscr) -> bool:
     game = Game(curses.COLS // 2, curses.LINES - 3)
 
     def render_point(p: Point) -> None:
@@ -91,7 +86,7 @@ def main(stdscr):
             if y >= game.height:
                 y = game.height - 1
         elif c == ord('q'):
-            return
+            return False
 
         for p in refresh:
             render_point(p)
@@ -104,12 +99,29 @@ def main(stdscr):
         stdscr.addstr(game.height + 1, 1, "lost", curses.color_pair(9))
 
     render_all()
-    curses.curs_set(0)
+    return True
 
-    while True:
-        c = stdscr.getch()
-        if c == ord('q'):
-            return
+
+def main(stdscr):
+    curses.use_default_colors()
+    stdscr.clear()
+    init_color()
+
+    wants_playing = True
+
+    while wants_playing:
+        curses.curs_set(1)
+        wants_playing = game_round(stdscr)
+        curses.curs_set(0)
+
+        while wants_playing:
+            c = stdscr.getch()
+            if c == ord('q'):
+                wants_playing = False
+            elif c == ord('r'):
+                break
+
+
 
 
 if __name__ == "__main__":

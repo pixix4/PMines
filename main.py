@@ -3,7 +3,7 @@
 import curses
 from typing import Set
 
-from game import Game, Point, FieldState
+from game import Game, Field, FieldState
 
 
 def init_color():
@@ -17,10 +17,11 @@ def init_color():
     curses.init_pair(8, curses.COLOR_YELLOW, -1)
     curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_RED)
 
+
 def game_round(stdscr) -> bool:
     game = Game(curses.COLS // 2, curses.LINES - 3)
 
-    def render_point(p: Point) -> None:
+    def render_point(p: Field) -> None:
         state = game.field_state(p)
         x, y = p
         x = x * 2 + 1
@@ -42,8 +43,8 @@ def game_round(stdscr) -> bool:
             stdscr.addstr(y, x, '?')
 
     def render_all():
-        for x in range (0, game.width):
-            for y in range (0, game.height):
+        for x in range(0, game.width):
+            for y in range(0, game.height):
                 render_point((x, y))
 
     render_all()
@@ -55,18 +56,18 @@ def game_round(stdscr) -> bool:
     while game.running:
         y, x = stdscr.getyx()
         stdscr.addstr(game.height + 1, 1, "live", curses.color_pair(8))
-        stdscr.addstr(game.height + 2, 1, str(game.mines_left)+" mines remaining", curses.color_pair(8))
+        stdscr.addstr(game.height + 2, 1, str(game.mines_left) + " mines remaining           ", curses.color_pair(8))
         stdscr.move(y, x)
 
         c = stdscr.getch()
         p = (x - 1) // 2, y
-        refresh: Set[Point] = set()
+        refresh: Set[Field] = set()
         if c == ord(' '):
             h = game.click_field(p)
             if h is None:
                 break
             refresh.update(h)
-        elif c == ord('f'):
+        elif c == ord('f') or c == ord('F'):
             game.flag_field(p)
             refresh.add(p)
         elif c == curses.KEY_UP or c == ord('w') or c == ord('k'):
@@ -87,6 +88,14 @@ def game_round(stdscr) -> bool:
                 y = game.height - 1
         elif c == ord('q'):
             return False
+        elif c == ord('R') and game.started:
+            game.lose()
+        elif c == ord('H'):
+            if game.started:
+                h = game.hint()
+                if h is None:
+                    break
+                refresh.add(h)
 
         for p in refresh:
             render_point(p)
@@ -97,6 +106,7 @@ def game_round(stdscr) -> bool:
         stdscr.addstr(game.height + 1, 1, "won ", curses.color_pair(2))
     else:
         stdscr.addstr(game.height + 1, 1, "lost", curses.color_pair(9))
+    stdscr.addstr(game.height + 2, 1, str(game.mines_left) + " mines remaining           ", curses.color_pair(8))
 
     render_all()
     return True
@@ -118,10 +128,8 @@ def main(stdscr):
             c = stdscr.getch()
             if c == ord('q'):
                 wants_playing = False
-            elif c == ord('r'):
+            elif c == ord('r') or c == ord('R'):
                 break
-
-
 
 
 if __name__ == "__main__":

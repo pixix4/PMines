@@ -14,6 +14,7 @@ class FieldState(Enum):
     MINE = 3
     FLAG_RIGHT = 4
     FLAG_FALSE = 5
+    FLAG_HINT = 6
 
 
 class Direction(Enum):
@@ -44,6 +45,7 @@ class Game:
         self._mines: Set[Field] = None
         self._flags: Set[Field] = set()
         self._opened: Set[Field] = set()
+        self._helped: Set[Field] = set()
         self._running: bool = True
         self._won: bool = None
 
@@ -109,6 +111,7 @@ class Game:
                             h = self.translate_point(p, d)
                             if h in self._mines and h not in self._flags:
                                 self.flag_field(h, True)
+                                self._helped.add(h)
                                 return h
         return None
 
@@ -246,11 +249,15 @@ class Game:
 
         if self._running:
             if p in self._flags:
+                if p in self._helped:
+                    return FieldState.FLAG_HINT
                 return FieldState.FLAG
             return FieldState.DEFAULT
         else:
             if p in self._mines:
                 if p in self._flags:
+                    if p in self._helped:
+                        return FieldState.FLAG_HINT
                     return FieldState.FLAG_RIGHT
                 return FieldState.MINE
             else:
@@ -280,7 +287,8 @@ class Game:
                 state = self.field_state((x, y))
                 if state == FieldState.DEFAULT:
                     line += "*"
-                elif state == FieldState.FLAG or state == FieldState.FLAG_FALSE or state == FieldState.FLAG_RIGHT:
+                elif state == FieldState.FLAG or state == FieldState.FLAG_FALSE \
+                        or state == FieldState.FLAG_RIGHT or state == FieldState.FLAG_HINT:
                     line += "?"
                 elif state == FieldState.MINE:
                     line += "X"

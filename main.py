@@ -12,7 +12,7 @@ def init_color():
     curses.init_pair(3, curses.COLOR_RED, -1)
     curses.init_pair(4, curses.COLOR_CYAN, -1)
     curses.init_pair(5, curses.COLOR_MAGENTA, -1)
-    curses.init_pair(6, curses.COLOR_MAGENTA, -1)
+    curses.init_pair(6, curses.COLOR_YELLOW, -1)
     curses.init_pair(7, curses.COLOR_YELLOW, -1)
     curses.init_pair(8, curses.COLOR_YELLOW, -1)
     curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_RED)
@@ -29,6 +29,8 @@ def game_round(stdscr) -> bool:
             stdscr.addstr(y, x, '*')
         elif state == FieldState.FLAG:
             stdscr.addstr(y, x, '?')
+        elif state == FieldState.FLAG_HINT:
+            stdscr.addstr(y, x, '?', curses.color_pair(8))
         elif state == FieldState.OPEN:
             count = game.count_mines(p)
             if count == 0:

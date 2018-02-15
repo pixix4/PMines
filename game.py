@@ -1,10 +1,15 @@
 import itertools
+import time
 from enum import Enum
 from random import sample
 from typing import Optional
 from typing import Set, Tuple, List
 
 Field = Tuple[int, int]
+
+
+def current_time():
+    return int(round(time.time() * 1000))
 
 
 class FieldState(Enum):
@@ -48,6 +53,31 @@ class Game:
         self._helped: Set[Field] = set()
         self._running: bool = True
         self._won: bool = None
+        self._last_time = current_time()
+        self._duration = 0
+        self._pause = False
+
+    def pause(self):
+        if self.started and self._running and not self._pause:
+            self._pause = True
+            self._duration += current_time() - self._last_time
+
+    def unpause(self):
+        if self.started and self._running and self._pause:
+            self._pause = False
+            self._last_time = current_time()
+
+    @property
+    def paused(self):
+        return self._pause
+
+    @property
+    def duration(self):
+        if self.started and self._running and not self._pause:
+            t = current_time()
+            self._duration += t - self._last_time
+            self._last_time = t
+        return self._duration
 
     def translate_point(self, p: Field, d: Direction) -> Optional[Tuple[int, int]]:
         x, y = p
@@ -99,8 +129,7 @@ class Game:
             copy = self.copy()
             changed = solve(copy)
 
-            if changed: # or len(self._flags - self._mines) > 0:
-
+            if changed:
                 self.lose()
                 return None
             else:
@@ -136,14 +165,18 @@ class Game:
         if (len(self._mines - self._flags) == 0) and len(self._opened) + len(self._mines) == self._width * self._height:
             self._running = False
             self._won = True
+            self._duration += current_time() - self._last_time
 
     def lose(self):
         self._running = False
         self._won = False
+        self._duration += current_time() - self._last_time
 
     def click_field(self, p: Field) -> Optional[Set[Field]]:
         if not self.started:
             self.init_mines(p)
+            self._last_time = current_time()
+            self._duration = 0
 
         if p in self._flags:
             return set()
@@ -384,12 +417,15 @@ def _solve_game(game: Game) -> bool:
     opened = set([x for x in game.opened_fields if game.count_mines(x) > 0])
 
     def point_to_section(sec: Set[Field], p: Field):
-        sec.add(p)
-        opened.remove(p)
-        for d in Direction:
-            h = game.translate_point(p, d)
-            if h is not None and h in opened:
-                point_to_section(sec, h)
+        todo = [p]
+        while len(todo) > 0:
+            p = todo.pop()
+            sec.add(p)
+            opened.remove(p)
+            for d in Direction:
+                h = game.translate_point(p, d)
+                if h is not None and h in opened and h not in todo:
+                    todo.append(h)
 
     changed = False
 
@@ -404,7 +440,7 @@ def _solve_game(game: Game) -> bool:
 
 
 if __name__ == "__main__":
-    g = Game(10, 10)
+    g = Game(100, 50)
     g.click_field((0, 0))
 
     g.print()

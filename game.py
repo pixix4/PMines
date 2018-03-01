@@ -33,6 +33,10 @@ class Direction(Enum):
     TOP_LEFT = 7
 
 
+def calc_mine_count(width: int, height: int) -> int:
+    return int(width * height // 6.25)
+
+
 class Game:
 
     def __init__(self, width: int, height: int, count: int = 0):
@@ -43,7 +47,7 @@ class Game:
         self._height: int = height
 
         if count == 0:
-            count = int(width * height // 6.25)
+            count = calc_mine_count(width, height)
 
         self._count: int = count
 

@@ -3,10 +3,12 @@
 import curses
 import string
 from operator import itemgetter
-from os import path
+from os import path, environ
 from typing import Set, List, Tuple, Optional
 
 from game import Game, Field, FieldState
+from scoreboard import Scoreboard
+from views.menu import Menu
 
 
 def init_color():
@@ -363,5 +365,24 @@ def main(stdscr):
                 render_foot(stdscr, game)
 
 
+def startup(screen):
+    height = curses.LINES
+    width = curses.COLS
+
+    curses.use_default_colors()
+    screen.clear()
+    curses.curs_set(False)
+    init_color()
+
+    top = curses.newwin(height - 3, width, 0, 0)
+    bottom = curses.newwin(2, width, height - 2, 0)
+
+    Scoreboard.load()
+
+    menu = Menu(screen, top, bottom)
+    menu.start()
+
+
 if __name__ == "__main__":
-    curses.wrapper(main)
+    environ.setdefault('ESCDELAY', '25')
+    curses.wrapper(startup)

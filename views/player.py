@@ -5,6 +5,7 @@ import views.utils
 from game import Field, Game, FieldState
 from views.pause import Pause
 from views.view import View
+from views.score import Score
 
 
 class Player(View):
@@ -113,7 +114,11 @@ class Player(View):
         return refresh
 
     def action_on_finished(self, key: chr) -> None:
-        if key not in [curses.KEY_UP, ord('w'), ord('k'), curses.KEY_LEFT, ord('a'), ord('h'), curses.KEY_RIGHT, ord('d'), ord('l'), curses.KEY_DOWN, ord('s'), ord('j')]:
+        if self._game.won and key in [ord(' '), 10]:
+            score = Score(self._screen, self._top, self._bottom)
+            score.start_width_new_value(self._game.duration)
+            self._active = False
+        elif key not in [curses.KEY_UP, ord('w'), ord('k'), curses.KEY_LEFT, ord('a'), ord('h'), curses.KEY_RIGHT, ord('d'), ord('l'), curses.KEY_DOWN, ord('s'), ord('j')]:
             self._active = False
 
     def on_action(self, key: chr) -> Optional[List[Field]]:

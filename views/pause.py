@@ -2,6 +2,7 @@ from sys import exit
 
 from views.dialog import Dialog
 from game import Game
+from views.score import Score
 
 
 class Pause(Dialog):
@@ -24,9 +25,10 @@ class Pause(Dialog):
     def resume() -> bool:
         return True
 
-    @staticmethod
     def score(self) -> bool:
-        pass
+        score = Score(self._screen, self._top, self._bottom)
+        score.start()
+        return False
 
     def hint(self) -> bool:
         self._game.hint()

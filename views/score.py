@@ -198,7 +198,10 @@ class Score(View):
                 self._active = False
         else:
             if key in [curses.KEY_BACKSPACE]:
-                self._editing_name = self._editing_name[:-1]
+                if self._editing_name == Scoreboard.PLACEHOLDER:
+                    self._editing_name = ""
+                else:
+                    self._editing_name = self._editing_name[:-1]
             elif key in [10]:
                 Scoreboard.add_score(self.score_number, self._editing_time, self._editing_name)
                 self._list = Scoreboard.get_score(self.score_number)
@@ -209,5 +212,8 @@ class Score(View):
                 self._editing_name = None
                 self._editing_time = None
             elif key < 256 and chr(key).isprintable():
-                self._editing_name += chr(key)
+                if self._editing_name == Scoreboard.PLACEHOLDER:
+                    self._editing_name = chr(key)
+                else:
+                    self._editing_name += chr(key)
         return None

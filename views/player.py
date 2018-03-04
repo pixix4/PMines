@@ -3,9 +3,10 @@ from typing import Optional, List, Set
 
 import views.utils
 from game import Field, Game, FieldState
+from scoreboard import Scoreboard
 from views.pause import Pause
-from views.view import View
 from views.score import Score
+from views.view import View
 
 
 class Player(View):
@@ -61,10 +62,11 @@ class Player(View):
                                 curses.color_pair(8))
         else:
             if self._game.won:
+                pos, _ = Scoreboard.get_score_with_new_value(self._game.count, self._game.duration)
                 self._bottom.addstr(0, 1, "won", curses.color_pair(2))
                 self._bottom.addstr(1, 1,
                                     "Time: {} ({} place)".format(views.utils.format_time(self._game.duration),
-                                                                 views.utils.ordinal(1)),
+                                                                 views.utils.ordinal(pos + 1)),
                                     curses.color_pair(2))
             else:
                 self._bottom.addstr(0, 1, "lost", curses.color_pair(9))
@@ -118,7 +120,8 @@ class Player(View):
             score = Score(self._screen, self._top, self._bottom)
             score.start_width_new_value(self._game.duration)
             self._active = False
-        elif key not in [curses.KEY_UP, ord('w'), ord('k'), curses.KEY_LEFT, ord('a'), ord('h'), curses.KEY_RIGHT, ord('d'), ord('l'), curses.KEY_DOWN, ord('s'), ord('j')]:
+        elif key not in [curses.KEY_UP, ord('w'), ord('k'), curses.KEY_LEFT, ord('a'), ord('h'), curses.KEY_RIGHT,
+                         ord('d'), ord('l'), curses.KEY_DOWN, ord('s'), ord('j')]:
             self._active = False
 
     def on_action(self, key: chr) -> Optional[List[Field]]:

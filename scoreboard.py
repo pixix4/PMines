@@ -12,6 +12,8 @@ class Scoreboard:
     _filename = ".pmines.score"
     _list: Dict[int, Scorelist] = {}
 
+    PLACEHOLDER = "-- Your score --"
+
     @staticmethod
     def load():
         if path.isfile(Scoreboard._filename):
@@ -65,7 +67,7 @@ class Scoreboard:
         else:
             scorelist = []
 
-        new = (new_value, "-- Your score --")
+        new = (new_value, Scoreboard.PLACEHOLDER)
         scorelist.append(new)
 
         scorelist = sorted(scorelist, key=itemgetter(0))

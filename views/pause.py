@@ -34,9 +34,9 @@ class Pause(Dialog):
         self._game.hint()
         return True
 
-    @staticmethod
     def give_up(self) -> bool:
-        pass
+        self._game.lose()
+        return True
 
     @staticmethod
     def quit() -> bool:

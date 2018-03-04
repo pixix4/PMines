@@ -444,11 +444,9 @@ def _solve_game(game: Game) -> bool:
 
 
 if __name__ == "__main__":
-    g = Game(100, 50)
-    g.click_field((0, 0))
-
-    g.print()
+    g = Game(25, 25)
+    g.click_field((g.height // 2, g.width // 2))
     solve(g)
     g.print()
 
-    print("Won: " + str(g.won))
+    print("Won: {} | Mines: {}/{}".format(g.won, g.count - g.mines_left, g.count))

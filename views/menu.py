@@ -19,7 +19,7 @@ class Menu(Dialog):
 
     def draw_footer(self):
         height, width = get_size_from_screen(self._top)
-        return "", "", "Difficulty: " + str(calc_mine_count(width, height)), "0.7.2"
+        return "", "", "Difficulty: " + str(calc_mine_count(width, height)), "1.0.0"
 
     def start_game(self) -> bool:
         player = Player(self._screen, self._top, self._bottom)

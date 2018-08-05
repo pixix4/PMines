@@ -21,6 +21,7 @@ def init_color():
     curses.init_pair(7, curses.COLOR_YELLOW, -1)
     curses.init_pair(8, curses.COLOR_YELLOW, -1)
     curses.init_pair(9, curses.COLOR_WHITE, curses.COLOR_RED)
+    curses.init_pair(10, curses.COLOR_WHITE, curses.COLOR_YELLOW)
 
 
 def _score_file_name(game: Game = None) -> str:

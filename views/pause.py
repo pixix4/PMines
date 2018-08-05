@@ -1,13 +1,13 @@
 from sys import exit
 
-from views.dialog import Dialog
 from game import Game
+from views.dialog import Dialog
 from views.score import Score
 
 
 class Pause(Dialog):
 
-    def __init__(self, screen, top, bottom, game:Game):
+    def __init__(self, screen, top, bottom, game: Game):
         super(Pause, self).__init__(screen, top, bottom)
 
         self._game = game
@@ -17,6 +17,8 @@ class Pause(Dialog):
 
         self.add_entry("Resume", self.resume)
         self.add_entry("Hint", self.hint)
+        self.add_entry("Auto solve", self.solve)
+        self.add_entry("Highlight unsolved", self.highlight)
         self.add_entry("Give up", self.give_up)
         self.add_entry("Scoreboard", self.score)
         self.add_entry("Quit", self.quit)
@@ -32,6 +34,14 @@ class Pause(Dialog):
 
     def hint(self) -> bool:
         self._game.hint()
+        return True
+
+    def highlight(self) -> bool:
+        self._game.highlight_missing = not self._game.highlight_missing
+        return True
+
+    def solve(self) -> bool:
+        self._game.auto_solve = True
         return True
 
     def give_up(self) -> bool:

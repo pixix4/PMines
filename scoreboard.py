@@ -9,7 +9,7 @@ Scorelist = List[Tuple[int, str]]
 
 
 class Scoreboard:
-    _filename = ".pmines.score"
+    _filename = path.expanduser("~/.pmines.score")
     _list: Dict[int, Scorelist] = {}
 
     PLACEHOLDER = "-- Your score --"

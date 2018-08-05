@@ -27,7 +27,10 @@ class Player(View):
         x, y = p
         x = x * 2 + 1
         if state == FieldState.DEFAULT:
-            self._top.addstr(y, x, '*', sel)
+            if self._game.highlight_missing:
+                self._top.addstr(y, x, '*', curses.color_pair(10) | sel)
+            else:
+                self._top.addstr(y, x, '*', sel)
         elif state == FieldState.FLAG or state == FieldState.FLAG_RIGHT:
             self._top.addstr(y, x, '?', sel)
         elif state == FieldState.FLAG_HINT:
@@ -46,7 +49,18 @@ class Player(View):
     def get_listen_window(self):
         return self._screen
 
+    def sleep_draw(self, refresh: Optional[List[Field]]):
+        self.draw(refresh)
+
+        self.refresh()
+        # time.sleep(0.01)
+
     def draw(self, refresh: List[Field] = None):
+        if self._game.auto_solve:
+            self._game.auto_solve = False
+            self.sleep_draw(None)
+            self._game.solve_animated(self.sleep_draw)
+
         if refresh is None:
             for x in range(0, self._game.width):
                 for y in range(0, self._game.height):

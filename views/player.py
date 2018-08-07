@@ -1,5 +1,5 @@
 import curses
-from typing import Optional, List, Set
+from typing import Optional, List, Set, Tuple
 
 import views.utils
 from game import Field, Game, FieldState
@@ -49,7 +49,13 @@ class Player(View):
     def get_listen_window(self):
         return self._screen
 
-    def sleep_draw(self, refresh: Optional[List[Field]]):
+    def sleep_draw(self, refresh: Optional[List[Field]], cursor: Optional[Tuple[int, int]] = None):
+        if cursor is not None:
+            if refresh is not None:
+                refresh = list(refresh)
+                refresh.append(self._position)
+            self._position = cursor
+
         self.draw(refresh)
 
         self.refresh()

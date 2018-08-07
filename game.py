@@ -4,6 +4,7 @@ from enum import Enum
 from random import sample
 from typing import Optional, Callable
 from typing import Set, Tuple, List
+import sys
 
 Field = Tuple[int, int]
 
@@ -157,7 +158,7 @@ class Game:
             return None
         return None
 
-    def solve_animated(self, draw: Callable[[Optional[List[Field]]], None]):
+    def solve_animated(self, draw: Callable[[Optional[List[Field]], Optional[Tuple[int, int]]], None]):
         if self.running:
             solve(self, draw)
             return None
@@ -356,7 +357,8 @@ class Game:
         print("╰" + h + "╯")
 
 
-def solve(game: Game, draw: Callable[[Optional[List[Field]]], None] = None) -> bool:
+def solve(game: Game, draw: Callable[
+    [Optional[List[Field]], Optional[Tuple[int, int]], Optional[Tuple[int, int]]], None] = None) -> bool:
     changed = False
 
     if not game.started:
@@ -372,7 +374,7 @@ def solve(game: Game, draw: Callable[[Optional[List[Field]]], None] = None) -> b
 
 
 def _solve_bands(game: Game, b1: Tuple[int, Set[Field]], b2: Tuple[int, Set[Field]],
-                 draw: Callable[[Optional[List[Field]]], None]) -> bool:
+                 draw: Callable[[Optional[List[Field]], Optional[Tuple[int, int]]], None]) -> bool:
     b1_missing, b1_fields = b1
     b2_missing, b2_fields = b2
 
@@ -397,18 +399,19 @@ def _solve_bands(game: Game, b1: Tuple[int, Set[Field]], b2: Tuple[int, Set[Fiel
                 changed = True
                 x = game.click_field(h)
                 if draw is not None:
-                    draw(x)
+                    draw(x, h)
         elif len(outer) == (b2_missing - b1_missing):
             for h in outer:
                 changed = True
                 game.flag_field(h, True)
                 if draw is not None:
-                    draw([h])
+                    draw([h], h)
 
     return changed
 
 
-def _solve_section(game: Game, section: Set[Field], draw: Callable[[Optional[List[Field]]], None]) -> bool:
+def _solve_section(game: Game, section: Set[Field],
+                   draw: Callable[[Optional[List[Field]], Optional[Tuple[int, int]]], None]) -> bool:
     bands: List[Tuple[int, Set[Field]]] = []
     changed = False
 
@@ -426,7 +429,7 @@ def _solve_section(game: Game, section: Set[Field], draw: Callable[[Optional[Lis
                 for h in band:
                     game.flag_field(h, True)
                     if draw is not None:
-                        draw([h])
+                        draw([h], h)
                     changed = True
             else:
                 bands.append((missing, band))
@@ -434,7 +437,7 @@ def _solve_section(game: Game, section: Set[Field], draw: Callable[[Optional[Lis
             for h in band:
                 x = game.click_field(h)
                 if draw is not None:
-                    draw(x)
+                    draw(x, h)
                 changed = True
 
     for b1, b2 in itertools.combinations(bands, 2):
@@ -444,8 +447,24 @@ def _solve_section(game: Game, section: Set[Field], draw: Callable[[Optional[Lis
     return changed
 
 
-def _solve_game(game: Game, draw: Callable[[Optional[List[Field]]], None]) -> bool:
-    opened = set([x for x in game.opened_fields if game.count_mines(x) > 0])
+def timing(f):
+    def wrap(*args):
+        time1 = time.time()
+        ret = f(*args)
+        time2 = time.time()
+        print('{:s} function took {:.3f} ms'.format(f.__name__, (time2 - time1) * 1000.0), file=sys.stderr)
+
+        return ret
+
+    return wrap
+
+
+def get_opened(game: Game) -> Set[Field]:
+    return set([x for x in game.opened_fields if game.count_mines(x) > 0])
+
+
+def _solve_game(game: Game, draw: Callable[[Optional[List[Field]], Optional[Tuple[int, int]]], None]) -> bool:
+    opened = get_opened(game)
 
     def point_to_section(sec: Set[Field], p: Field):
         todo = [p]

@@ -1,4 +1,5 @@
 import curses
+import sys
 from abc import abstractmethod
 from typing import List, Tuple, Callable, Optional
 
@@ -47,6 +48,13 @@ class Dialog(View):
         height = len(self._entries) + 6
 
         max_height, max_width = self._screen.getmaxyx()
+        height = min(height, max_height)
+
+        print("---------------", file=sys.stderr, flush=True)
+        print(height, file=sys.stderr, flush=True)
+        print(width, file=sys.stderr, flush=True)
+        print(max_height // 2 - height // 2, file=sys.stderr, flush=True)
+        print((max_width // 2 - width // 2) // 2 * 2 + 1, file=sys.stderr, flush=True)
 
         self._window = curses.newwin(height, width, max_height // 2 - height // 2,
                                      (max_width // 2 - width // 2) // 2 * 2 + 1)
@@ -66,11 +74,18 @@ class Dialog(View):
         self._window.addstr(2, 0, "╠")
         self._window.addstr(2, width - 1, "╣")
 
+        pos = 0
         for i, line in enumerate(self._entries):
+            if pos > 0 and height < 6 and self._active_entry is not None:
+                continue
+            if pos + 6 >= height and i != self._active_entry and (pos != 0 or self._active_entry is not None):
+                continue
+
             selected = curses.A_NORMAL
             if i == self._active_entry:
                 selected = curses.A_REVERSE
-            self._window.addstr(i + 4, 2, line[0].center(width - 4, " "), selected)
+            self._window.addstr(pos + 4, 2, line[0].center(width - 4, " "), selected)
+            pos += 1
 
         self.clean_bottom()
         _, footer_width = self._bottom.getmaxyx()

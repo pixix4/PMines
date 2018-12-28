@@ -27,7 +27,7 @@ def init_color():
 def _score_file_name(game: Game = None) -> str:
     if game is None:
         game = generate_game()
-    return ".pmines_{}_{}_{}.score".format(game.width, game.height, game.count)
+    return ".pmines_{}_{}_{}_{}.score".format(game.width, game.height, game.count, Game.difficulty.name)
 
 
 def get_scores_for_game(game: Game) -> List[Tuple[int, str]]:

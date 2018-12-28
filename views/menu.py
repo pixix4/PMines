@@ -1,11 +1,11 @@
 from sys import exit
 
-from game import calc_mine_count
+from game import calc_mine_count, Game
 from views.dialog import Dialog
 from views.player import Player
 from views.utils import get_size_from_screen
 from views.score import Score
-
+from views.settings import Settings
 
 class Menu(Dialog):
 
@@ -19,7 +19,7 @@ class Menu(Dialog):
 
     def draw_footer(self):
         height, width = get_size_from_screen(self._top)
-        return "", "", "Difficulty: " + str(calc_mine_count(width, height)), "1.0.0"
+        return "", "", "Difficulty: " + str(calc_mine_count(width, height)) + " (" + Game.difficulty.name + ")", "1.0.0"
 
     def start_game(self) -> bool:
         player = Player(self._screen, self._top, self._bottom)
@@ -31,9 +31,10 @@ class Menu(Dialog):
         score.start()
         return False
 
-    @staticmethod
-    def settings() -> bool:
-        pass
+    def settings(self) -> bool:
+        settings = Settings(self._screen, self._top, self._bottom)
+        settings.start()
+        return False
 
     @staticmethod
     def quit() -> bool:

@@ -34,11 +34,23 @@ class Direction(Enum):
     TOP_LEFT = 7
 
 
+class Difficulty(Enum):
+    EASY = 0
+    NORMAL = 1
+    HARD = 2
+
 def calc_mine_count(width: int, height: int) -> int:
-    return int(width * height // 6.25)
+    factor = 6.25
+    if Game.difficulty == Difficulty.EASY:
+        factor = 10
+    elif Game.difficulty == Difficulty.HARD:
+        factor = 5
+    return int(width * height // factor)
 
 
 class Game:
+
+    difficulty = Difficulty.NORMAL
 
     def __init__(self, width: int, height: int, count: int = 0):
         if width * height - 8 < count:

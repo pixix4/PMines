@@ -100,6 +100,7 @@ class Player(View):
         pause.start()
 
         self._game.unpause()
+        self.draw()
 
     def action_on_running(self, key: chr) -> Optional[Set[Field]]:
         if key in [ord(' '), 10]:

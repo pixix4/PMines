@@ -387,3 +387,4 @@ def startup(screen):
 if __name__ == "__main__":
     environ.setdefault('ESCDELAY', '25')
     curses.wrapper(startup)
+

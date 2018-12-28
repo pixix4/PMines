@@ -50,11 +50,11 @@ class Dialog(View):
         max_height, max_width = self._screen.getmaxyx()
         height = min(height, max_height)
 
-        print("---------------", file=sys.stderr, flush=True)
-        print(height, file=sys.stderr, flush=True)
-        print(width, file=sys.stderr, flush=True)
-        print(max_height // 2 - height // 2, file=sys.stderr, flush=True)
-        print((max_width // 2 - width // 2) // 2 * 2 + 1, file=sys.stderr, flush=True)
+        #print("---------------", file=sys.stderr, flush=True)
+        #print(height, file=sys.stderr, flush=True)
+        #print(width, file=sys.stderr, flush=True)
+        #print(max_height // 2 - height // 2, file=sys.stderr, flush=True)
+        #print((max_width // 2 - width // 2) // 2 * 2 + 1, file=sys.stderr, flush=True)
 
         self._window = curses.newwin(height, width, max_height // 2 - height // 2,
                                      (max_width // 2 - width // 2) // 2 * 2 + 1)
@@ -118,3 +118,4 @@ class Dialog(View):
             self.clean()
 
         return None
+

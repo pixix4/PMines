@@ -65,3 +65,4 @@ class View(ABC):
         self._screen.refresh()
         self._top.refresh()
         self._bottom.refresh()
+
